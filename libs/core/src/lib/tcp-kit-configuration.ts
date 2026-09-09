@@ -10,7 +10,10 @@ export interface TcpKitConfiguration {
   logFile: string | null;
 }
 
-export const defaultTcpKitConfiguration: Omit<TcpKitConfiguration, 'tcpEndpoint'> = {
+export const defaultTcpKitConfiguration: Omit<
+  TcpKitConfiguration,
+  'tcpEndpoint'
+> = {
   connectionTimeout: 5000,
   requestTimeout: 30000,
   maximumPayloadSize: 1024 * 1024,
@@ -25,9 +28,14 @@ export function createTcpKitConfiguration(
 ): TcpKitConfiguration {
   return {
     tcpEndpoint,
-    connectionTimeout: overrides.connectionTimeout ?? defaultTcpKitConfiguration.connectionTimeout,
-    requestTimeout: overrides.requestTimeout ?? defaultTcpKitConfiguration.requestTimeout,
-    maximumPayloadSize: overrides.maximumPayloadSize ?? defaultTcpKitConfiguration.maximumPayloadSize,
+    connectionTimeout:
+      overrides.connectionTimeout ??
+      defaultTcpKitConfiguration.connectionTimeout,
+    requestTimeout:
+      overrides.requestTimeout ?? defaultTcpKitConfiguration.requestTimeout,
+    maximumPayloadSize:
+      overrides.maximumPayloadSize ??
+      defaultTcpKitConfiguration.maximumPayloadSize,
     transport: overrides.transport ?? defaultTcpKitConfiguration.transport,
     debug: overrides.debug ?? defaultTcpKitConfiguration.debug,
     logFile: overrides.logFile ?? defaultTcpKitConfiguration.logFile,

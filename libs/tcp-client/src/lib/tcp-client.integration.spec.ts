@@ -2,7 +2,9 @@ import { createServer, type Server, type Socket } from 'node:net';
 import { TcpClient } from './tcp-client.js';
 import { TcpFrameEncoder, TcpFrameDecoder } from '@tcpkit/protocol';
 
-function createEchoServer(handler?: (request: unknown) => unknown): Promise<{ server: Server; port: number }> {
+function createEchoServer(
+  handler?: (request: unknown) => unknown,
+): Promise<{ server: Server; port: number }> {
   return new Promise((resolve) => {
     const encoder = new TcpFrameEncoder();
     const server = createServer((socket: Socket) => {
@@ -10,8 +12,18 @@ function createEchoServer(handler?: (request: unknown) => unknown): Promise<{ se
       socket.on('data', (chunk) => {
         const messages = socketDecoder.push(chunk);
         for (const message of messages) {
-          const request = message as { requestId: string; pattern: string; payload: unknown };
-          const responsePayload = handler ? handler(request) : { requestId: request.requestId, success: true, payload: { echo: request.payload } };
+          const request = message as {
+            requestId: string;
+            pattern: string;
+            payload: unknown;
+          };
+          const responsePayload = handler
+            ? handler(request)
+            : {
+                requestId: request.requestId,
+                success: true,
+                payload: { echo: request.payload },
+              };
           const response = handler ? handler(request) : responsePayload;
           socket.write(encoder.serialize(response));
         }
@@ -35,7 +47,10 @@ describe('TcpClient integration', () => {
   });
 
   it('should fail to connect to unavailable port', async () => {
-    const client = new TcpClient({ host: '127.0.0.1', port: 59999 }, { connectionTimeout: 500 });
+    const client = new TcpClient(
+      { host: '127.0.0.1', port: 59999 },
+      { connectionTimeout: 500 },
+    );
     await expect(client.connect()).rejects.toThrow();
   });
 
@@ -60,9 +75,14 @@ describe('TcpClient integration', () => {
       });
     });
     const portNeverRespond = await new Promise<number>((resolve) => {
-      serverNeverRespond.listen(0, '127.0.0.1', () => resolve((serverNeverRespond.address() as { port: number }).port));
+      serverNeverRespond.listen(0, '127.0.0.1', () =>
+        resolve((serverNeverRespond.address() as { port: number }).port),
+      );
     });
-    const client = new TcpClient({ host: '127.0.0.1', port: portNeverRespond }, { requestTimeout: 200 });
+    const client = new TcpClient(
+      { host: '127.0.0.1', port: portNeverRespond },
+      { requestTimeout: 200 },
+    );
     await expect(client.send('ping', {})).rejects.toThrow('timed out');
     await client.close();
     serverNeverRespond.close();
@@ -77,14 +97,26 @@ describe('TcpClient integration', () => {
         const messages = socketDecoder.push(chunk);
         for (const message of messages) {
           const request = message as { requestId: string };
-          const response = { requestId: request.requestId, success: true, payload: { id: request.requestId } };
+          const response = {
+            requestId: request.requestId,
+            success: true,
+            payload: { id: request.requestId },
+          };
           socket.write(encoder.serialize(response));
         }
       });
     });
-    const port = await new Promise<number>((resolve) => server.listen(0, '127.0.0.1', () => resolve((server.address() as { port: number }).port)));
+    const port = await new Promise<number>((resolve) =>
+      server.listen(0, '127.0.0.1', () =>
+        resolve((server.address() as { port: number }).port),
+      ),
+    );
     const client = new TcpClient({ host: '127.0.0.1', port });
-    const results = await Promise.all([client.send('a', {}), client.send('b', {}), client.send('c', {})]);
+    const results = await Promise.all([
+      client.send('a', {}),
+      client.send('b', {}),
+      client.send('c', {}),
+    ]);
     expect(results.length).toBe(3);
     expect(results[0]).toHaveProperty('requestId');
     await client.close();
@@ -99,24 +131,42 @@ describe('TcpClient integration', () => {
       socket.on('data', (chunk) => {
         const messages = socketDecoder.push(chunk);
         for (const message of messages) {
-          const request = message as { requestId: string; payload: { index: number } };
-          pending.push({ requestId: request.requestId, index: (request.payload as { index: number }).index });
+          const request = message as {
+            requestId: string;
+            payload: { index: number };
+          };
+          pending.push({
+            requestId: request.requestId,
+            index: (request.payload as { index: number }).index,
+          });
           if (pending.length === 3) {
             const reversed = [...pending].reverse();
             for (const item of reversed) {
-              const response = { requestId: item.requestId, success: true, payload: { index: item.index } };
+              const response = {
+                requestId: item.requestId,
+                success: true,
+                payload: { index: item.index },
+              };
               socket.write(encoder.serialize(response));
             }
           }
         }
       });
     });
-    const port = await new Promise<number>((resolve) => server.listen(0, '127.0.0.1', () => resolve((server.address() as { port: number }).port)));
+    const port = await new Promise<number>((resolve) =>
+      server.listen(0, '127.0.0.1', () =>
+        resolve((server.address() as { port: number }).port),
+      ),
+    );
     const client = new TcpClient({ host: '127.0.0.1', port });
     const promise0 = client.send('test', { index: 0 });
     const promise1 = client.send('test', { index: 1 });
     const promise2 = client.send('test', { index: 2 });
-    const [response0, response1, response2] = await Promise.all([promise0, promise1, promise2]);
+    const [response0, response1, response2] = await Promise.all([
+      promise0,
+      promise1,
+      promise2,
+    ]);
     expect((response0 as { payload: { index: number } }).payload.index).toBe(0);
     expect((response1 as { payload: { index: number } }).payload.index).toBe(1);
     expect((response2 as { payload: { index: number } }).payload.index).toBe(2);
@@ -128,8 +178,15 @@ describe('TcpClient integration', () => {
     const server = createServer((socket) => {
       socket.destroy();
     });
-    const port = await new Promise<number>((resolve) => server.listen(0, '127.0.0.1', () => resolve((server.address() as { port: number }).port)));
-    const client = new TcpClient({ host: '127.0.0.1', port }, { requestTimeout: 500 });
+    const port = await new Promise<number>((resolve) =>
+      server.listen(0, '127.0.0.1', () =>
+        resolve((server.address() as { port: number }).port),
+      ),
+    );
+    const client = new TcpClient(
+      { host: '127.0.0.1', port },
+      { requestTimeout: 500 },
+    );
     await expect(client.send('ping', {})).rejects.toThrow();
     await client.close();
     server.close();
@@ -140,7 +197,11 @@ describe('TcpClient integration', () => {
     const decoder = new TcpFrameDecoder();
     const message = { test: 'fragmentation' };
     const framed = encoder.serialize(message);
-    const fragments = [framed.subarray(0, 1), framed.subarray(1, 3), framed.subarray(3)];
+    const fragments = [
+      framed.subarray(0, 1),
+      framed.subarray(1, 3),
+      framed.subarray(3),
+    ];
     let decoded: unknown[] = [];
     for (const fragment of fragments) {
       decoded = decoded.concat(decoder.push(fragment));

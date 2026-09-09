@@ -14,7 +14,19 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist", "!**/*.tsbuildinfo"],
-  "nx": { "tags": ["scope:core", "type:lib"] },
-  "dependencies": { "tslib": "^2.3.0", "@tcpkit/protocol": "0.0.1", "@tcpkit/tcp-client": "0.0.1" }
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "tags": [
+      "scope:core",
+      "type:lib"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "@tcpkit/protocol": "0.0.1",
+    "@tcpkit/tcp-client": "0.0.1"
+  }
 }

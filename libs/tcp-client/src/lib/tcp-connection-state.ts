@@ -6,4 +6,5 @@ export const TcpConnectionState = {
   CLOSING: 'CLOSING',
 } as const;
 
-export type TcpConnectionState = (typeof TcpConnectionState)[keyof typeof TcpConnectionState];
+export type TcpConnectionState =
+  (typeof TcpConnectionState)[keyof typeof TcpConnectionState];

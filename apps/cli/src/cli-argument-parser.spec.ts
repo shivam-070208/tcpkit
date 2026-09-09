@@ -5,12 +5,18 @@ describe('CliArgumentParser', () => {
 
   it('should parse valid endpoint localhost:4000', () => {
     const result = parser.parse(['localhost:4000']);
-    expect(result.tcpKitConfiguration.tcpEndpoint).toEqual({ host: 'localhost', port: 4000 });
+    expect(result.tcpKitConfiguration.tcpEndpoint).toEqual({
+      host: 'localhost',
+      port: 4000,
+    });
   });
 
   it('should parse IPv6 endpoint', () => {
     const result = parser.parse(['[::1]:4000']);
-    expect(result.tcpKitConfiguration.tcpEndpoint).toEqual({ host: '::1', port: 4000 });
+    expect(result.tcpKitConfiguration.tcpEndpoint).toEqual({
+      host: '::1',
+      port: 4000,
+    });
   });
 
   it('should throw for missing endpoint', () => {
@@ -26,7 +32,11 @@ describe('CliArgumentParser', () => {
   });
 
   it('should parse with connection timeout', () => {
-    const result = parser.parse(['localhost:4000', '--connection-timeout', '1000']);
+    const result = parser.parse([
+      'localhost:4000',
+      '--connection-timeout',
+      '1000',
+    ]);
     expect(result.tcpKitConfiguration.connectionTimeout).toBe(1000);
   });
 

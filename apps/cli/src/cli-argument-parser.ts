@@ -20,34 +20,57 @@ export class CliArgumentParser {
     }
 
     if (filteredPositional.length > 1) {
-      throw new Error(`Invalid arguments: expected single endpoint but got "${filteredPositional.join(' ')}"`);
+      throw new Error(
+        `Invalid arguments: expected single endpoint but got "${filteredPositional.join(' ')}"`,
+      );
     }
 
     const rawEndpoint = filteredPositional[0] as string;
     const tcpEndpoint: TcpEndpoint = this.tcpEndpointParser.parse(rawEndpoint);
 
-    const connectionTimeout = this.extractNumericOption(rawArguments, '--connection-timeout');
-    const requestTimeout = this.extractNumericOption(rawArguments, '--request-timeout');
+    const connectionTimeout = this.extractNumericOption(
+      rawArguments,
+      '--connection-timeout',
+    );
+    const requestTimeout = this.extractNumericOption(
+      rawArguments,
+      '--request-timeout',
+    );
     const transport = this.extractStringOption(rawArguments, '--transport');
     const logFile = this.extractStringOption(rawArguments, '--log-file');
-    const debug = rawArguments.includes('--debug') || rawArguments.includes('--verbose');
+    const debug =
+      rawArguments.includes('--debug') || rawArguments.includes('--verbose');
 
-    if (connectionTimeout !== undefined && (!Number.isInteger(connectionTimeout) || connectionTimeout <= 0)) {
-      throw new Error('Invalid --connection-timeout: must be a positive integer');
+    if (
+      connectionTimeout !== undefined &&
+      (!Number.isInteger(connectionTimeout) || connectionTimeout <= 0)
+    ) {
+      throw new Error(
+        'Invalid --connection-timeout: must be a positive integer',
+      );
     }
 
-    if (requestTimeout !== undefined && (!Number.isInteger(requestTimeout) || requestTimeout <= 0)) {
+    if (
+      requestTimeout !== undefined &&
+      (!Number.isInteger(requestTimeout) || requestTimeout <= 0)
+    ) {
       throw new Error('Invalid --request-timeout: must be a positive integer');
     }
 
-    if (transport !== undefined && transport !== 'tcpkit' && transport !== 'nest') {
+    if (
+      transport !== undefined &&
+      transport !== 'tcpkit' &&
+      transport !== 'nest'
+    ) {
       throw new Error('Invalid --transport: must be tcpkit or nest');
     }
 
     const tcpKitConfiguration = createTcpKitConfiguration(tcpEndpoint, {
       ...(connectionTimeout !== undefined ? { connectionTimeout } : {}),
       ...(requestTimeout !== undefined ? { requestTimeout } : {}),
-      ...(transport !== undefined ? { transport: transport as 'tcpkit' | 'nest' } : {}),
+      ...(transport !== undefined
+        ? { transport: transport as 'tcpkit' | 'nest' }
+        : {}),
       ...(debug ? { debug: true } : {}),
       ...(logFile !== undefined ? { logFile } : {}),
     });
@@ -73,7 +96,10 @@ export class CliArgumentParser {
     return positional;
   }
 
-  private extractNumericOption(rawArguments: string[], optionName: string): number | undefined {
+  private extractNumericOption(
+    rawArguments: string[],
+    optionName: string,
+  ): number | undefined {
     for (let index = 0; index < rawArguments.length; index++) {
       const argument = rawArguments[index] as string;
       if (argument === optionName) {
@@ -83,7 +109,9 @@ export class CliArgumentParser {
         }
         const numericValue = Number(nextArgument);
         if (Number.isNaN(numericValue)) {
-          throw new Error(`Invalid ${optionName}: ${nextArgument} is not a number`);
+          throw new Error(
+            `Invalid ${optionName}: ${nextArgument} is not a number`,
+          );
         }
         return numericValue;
       }
@@ -99,7 +127,10 @@ export class CliArgumentParser {
     return undefined;
   }
 
-  private extractStringOption(rawArguments: string[], optionName: string): string | undefined {
+  private extractStringOption(
+    rawArguments: string[],
+    optionName: string,
+  ): string | undefined {
     for (let index = 0; index < rawArguments.length; index++) {
       const argument = rawArguments[index] as string;
       if (argument === optionName) {

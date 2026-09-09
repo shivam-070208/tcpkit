@@ -1,4 +1,8 @@
-import { TcpInvalidFrameError, TcpOversizedPayloadError, TcpProtocolError } from './tcp-protocol-error.js';
+import {
+  TcpInvalidFrameError,
+  TcpOversizedPayloadError,
+  TcpProtocolError,
+} from './tcp-protocol-error.js';
 
 export class TcpFrameDecoder {
   private responseBuffer: Buffer = Buffer.alloc(0);
@@ -13,7 +17,10 @@ export class TcpFrameDecoder {
       const payloadSize = this.responseBuffer.readUInt32BE(0);
 
       if (payloadSize > this.maximumPayloadSize) {
-        throw new TcpOversizedPayloadError(payloadSize, this.maximumPayloadSize);
+        throw new TcpOversizedPayloadError(
+          payloadSize,
+          this.maximumPayloadSize,
+        );
       }
 
       if (payloadSize === 0) {

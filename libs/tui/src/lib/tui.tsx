@@ -26,10 +26,14 @@ export function TcpKitTui({ tcpKitConfiguration }: TcpKitTuiProperties) {
 
   const jsonPayloadValidator = useMemo(() => new JsonPayloadValidator(), []);
 
-  const [connectionState, setConnectionState] = useState<string>(TcpConnectionState.DISCONNECTED);
+  const [connectionState, setConnectionState] = useState<string>(
+    TcpConnectionState.DISCONNECTED,
+  );
   const [pattern, setPattern] = useState('ping');
   const [payloadInput, setPayloadInput] = useState('{\n  "id": 123\n}');
-  const [focusedField, setFocusedField] = useState<'pattern' | 'payload'>('pattern');
+  const [focusedField, setFocusedField] = useState<'pattern' | 'payload'>(
+    'pattern',
+  );
   const [isSending, setIsSending] = useState(false);
   const [responseText, setResponseText] = useState('Awaiting request...');
   const [responseTime, setResponseTime] = useState<string | null>(null);
@@ -92,7 +96,9 @@ export function TcpKitTui({ tcpKitConfiguration }: TcpKitTuiProperties) {
       setResponseText(JSON.stringify(tcpResponse, null, 2));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      setResponseText(`Error: ${message}\n\nEnsure:\n- target is running on ${endpointLabel}\n- pattern "${pattern}" is handled`);
+      setResponseText(
+        `Error: ${message}\n\nEnsure:\n- target is running on ${endpointLabel}\n- pattern "${pattern}" is handled`,
+      );
       setConnectionState(TcpConnectionState.ERROR);
       setConnectionError(message);
     } finally {
@@ -108,7 +114,9 @@ export function TcpKitTui({ tcpKitConfiguration }: TcpKitTuiProperties) {
     }
 
     if (key.tab) {
-      setFocusedField((previous) => (previous === 'pattern' ? 'payload' : 'pattern'));
+      setFocusedField((previous) =>
+        previous === 'pattern' ? 'payload' : 'pattern',
+      );
       return;
     }
 
@@ -154,10 +162,21 @@ export function TcpKitTui({ tcpKitConfiguration }: TcpKitTuiProperties) {
           ? 'red'
           : 'gray';
 
-  const statusDot = connectionState === TcpConnectionState.CONNECTED ? '●' : connectionState === TcpConnectionState.CONNECTING ? '◐' : '○';
+  const statusDot =
+    connectionState === TcpConnectionState.CONNECTED
+      ? '●'
+      : connectionState === TcpConnectionState.CONNECTING
+        ? '◐'
+        : '○';
 
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor="cyan" padding={1} width={80}>
+    <Box
+      flexDirection="column"
+      borderStyle="round"
+      borderColor="cyan"
+      padding={1}
+      width={80}
+    >
       <Box justifyContent="center">
         <Text bold color="cyan">
           TCP KIT
@@ -180,9 +199,17 @@ export function TcpKitTui({ tcpKitConfiguration }: TcpKitTuiProperties) {
         <Text bold color="cyanBright">
           Pattern {focusedField === 'pattern' ? '◀' : ''}
         </Text>
-        <Box borderStyle="single" borderColor={focusedField === 'pattern' ? 'cyan' : 'gray'} paddingX={1}>
-          <Text color={focusedField === 'pattern' ? 'white' : 'gray'}>{pattern || ' '}</Text>
-          {focusedField === 'pattern' && !isSending ? <Text color="cyan">▋</Text> : null}
+        <Box
+          borderStyle="single"
+          borderColor={focusedField === 'pattern' ? 'cyan' : 'gray'}
+          paddingX={1}
+        >
+          <Text color={focusedField === 'pattern' ? 'white' : 'gray'}>
+            {pattern || ' '}
+          </Text>
+          {focusedField === 'pattern' && !isSending ? (
+            <Text color="cyan">▋</Text>
+          ) : null}
         </Box>
       </Box>
 
@@ -190,9 +217,16 @@ export function TcpKitTui({ tcpKitConfiguration }: TcpKitTuiProperties) {
         <Text bold color="cyanBright">
           Payload (JSON) {focusedField === 'payload' ? '◀' : ''}
         </Text>
-        <Box borderStyle="single" borderColor={focusedField === 'payload' ? 'cyan' : 'gray'} paddingX={1} flexDirection="column">
+        <Box
+          borderStyle="single"
+          borderColor={focusedField === 'payload' ? 'cyan' : 'gray'}
+          paddingX={1}
+          flexDirection="column"
+        >
           <Text>{payloadInput || ' '}</Text>
-          {focusedField === 'payload' && !isSending ? <Text color="cyan">▋</Text> : null}
+          {focusedField === 'payload' && !isSending ? (
+            <Text color="cyan">▋</Text>
+          ) : null}
         </Box>
         {validationError ? <Text color="red">{validationError}</Text> : null}
       </Box>
@@ -203,7 +237,14 @@ export function TcpKitTui({ tcpKitConfiguration }: TcpKitTuiProperties) {
         <Text color="gray">Ctrl+C → Exit</Text>
       </Box>
 
-      <Box flexDirection="column" marginTop={1} borderStyle="single" borderColor="gray" paddingX={1} paddingY={1}>
+      <Box
+        flexDirection="column"
+        marginTop={1}
+        borderStyle="single"
+        borderColor="gray"
+        paddingX={1}
+        paddingY={1}
+      >
         <Box justifyContent="space-between">
           <Text bold color="cyanBright">
             Response

@@ -13,7 +13,8 @@ export class JsonPayloadValidator {
     try {
       return JSON.parse(trimmedPayload);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       throw new InvalidJsonPayloadError(`Invalid JSON\n\n${errorMessage}`);
     }
   }

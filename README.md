@@ -4,6 +4,7 @@ Local developer tool for communicating with TCP servers. Runs entirely on your m
 
 ```bash
 npx tcpkit localhost:4000
+npx tcpkit localhost:3001 --transport nest
 ```
 
 ## Overview
@@ -11,19 +12,20 @@ npx tcpkit localhost:4000
 TCP Kit connects directly to a TCP endpoint from your machine:
 
 ```
-User -> npx tcpkit <host>:<port> -> TCP (length-prefixed JSON) -> Microservice
+User -> npx tcpkit <host>:<port> [--transport nest] -> TCP -> Microservice
 ```
 
 V1 features:
-- Endpoint parsing and validation (hostname, IPv4, IPv6)
-- Length-prefixed JSON protocol (4-byte BE + UTF-8)
-- TCP connection lifecycle with states DISCONNECTED/CONNECTING/CONNECTED/ERROR/CLOSING
-- Request correlation via unique requestId
-- JSON payload validation
+
+- Endpoint parsing and validation (hostname, IPv4, IPv6, bracket `[::1]:4000`, no `split(":")`)
+- Two transports: `tcpkit` (4-byte BE length + JSON) and `nest` (NestJS `length#json` with `{id,pattern,data}`)
+- TCP connection lifecycle `DISCONNECTED/CONNECTING/CONNECTED/ERROR/CLOSING`
+- Request correlation via `requestId`/`id`, supports concurrent and out-of-order
+- JSON payload validation with `JsonPayloadValidator`
 - Interactive TUI (Ink) with pattern, payload, response, timing, errors
-- Timeouts: connection 5s, request 30s, max payload 1 MB
-- Concurrent requests and out-of-order handling
-- No NestJS, no HTTP, pure `node:net`
+- Timeouts: connection 5s, request 30s, max payload 1 MB (centralized `TcpKitConfiguration`)
+- Debug logger `TcpDebugLogger` to `stderr` + file (`--debug`, `--log-file`, `TCPKIT_DEBUG=1`)
+- No HTTP, pure `node:net`
 
 ## Installation
 
@@ -44,21 +46,22 @@ npx nx sync
 
 ```bash
 npx tcpkit localhost:4000
-# connect to any reachable host
-npx tcpkit 127.0.0.1:4000
+npx tcpkit localhost:3001 --transport nest --debug
+npx tcpkit 127.0.0.1:4000 --transport nest
 npx tcpkit 192.168.1.20:4000
 npx tcpkit my-service.local:5000
-npx tcpkit [::1]:4000
+npx tcpkit [::1]:4000 --transport nest
 ```
 
 TUI controls:
+
 - `Tab` switch field (Pattern ↔ Payload)
 - `Enter` send request
 - `Ctrl+C` exit
 
 ## Endpoint Syntax
 
-Endpoint is mandatory positional argument: `host:port`
+Endpoint is mandatory positional: `host:port`
 
 Supported:
 
@@ -71,20 +74,22 @@ my-service.local:5000
 [2001:db8::1]:4000
 ```
 
-Validation rejects: `localhost`, `:4000`, `localhost:`, `localhost:abc`, `localhost:0`, `localhost:65536`, `[::1`, `::1]:4000`. Errors are specific, e.g. `Port must be a number between 1 and 65535.`
-
-Parser does not use `split(":")`; IPv6 bracket notation is required.
+Validation rejects: `localhost`, `:4000`, `localhost:`, `localhost:abc`, `localhost:0`, `localhost:65536`, `[::1`, `::1]:4000`. Example: `Port must be a number between 1 and 65535.`
 
 ## CLI Options
 
 ```bash
-tcpkit <endpoint> [--connection-timeout <ms>] [--request-timeout <ms>]
+tcpkit <endpoint> [--connection-timeout <ms>] [--request-timeout <ms>] [--transport <tcpkit|nest>] [--debug] [--log-file <path>]
 ```
 
 ```bash
 tcpkit localhost:4000 --connection-timeout 5000
 tcpkit localhost:4000 --request-timeout 30000
-tcpkit localhost:4000 --connection-timeout=5000 --request-timeout=30000
+tcpkit localhost:3001 --transport nest
+tcpkit localhost:3001 --transport nest --debug --log-file ./tcpkit.log
+tcpkit 13.127.85.156:32003 --transport nest --request-timeout 60000
+TCPKIT_DEBUG=1 tcpkit localhost:3001 --transport nest
+TCPKIT_LOG_FILE=./debug.log tcpkit localhost:3001 --transport nest
 ```
 
 `--help` and `--version` supported.
@@ -94,32 +99,47 @@ tcpkit localhost:4000 --connection-timeout=5000 --request-timeout=30000
 Integrated Nx workspace:
 
 ```
-apps/cli      -> CLI entry, argument parser, Ink wiring
-libs/core     -> Shared: TcpKitConfiguration, JsonPayloadValidator, Request models
-libs/tcp-client -> TcpEndpointParser, TcpConnection, TcpClient, RequestCoordinator
-libs/protocol    -> TcpFrameEncoder, TcpFrameDecoder (4-byte length prefix)
-libs/tui      -> TcpKitTui (Ink + React)
+apps/cli       -> CLI entry, CliArgumentParser, Ink wiring
+libs/core      -> Shared: TcpKitConfiguration, JsonPayloadValidator, Request models
+libs/tcp-client -> TcpEndpointParser, TcpConnection, TcpClient, TcpRequestCoordinator, TcpDebugLogger
+libs/protocol   -> TcpFrameEncoder/Decoder (4-byte), TcpNestFrameEncoder/Decoder (length#json)
+libs/tui       -> TcpKitTui (Ink + React)
 ```
 
-Dependency direction: `CLI -> Core -> {TCP Client, Protocol, TUI}` with no cycles, core re-exports endpoint/client, TCP client uses protocol framing via `node:net`.
+Dependency: `CLI -> Core -> {TCP Client, Protocol, TUI}` no cycles. `TcpClient` uses `transport` to select framing and packet shape (`{requestId,pattern,payload}` vs Nest `{id,pattern,data}` → normalized to `{requestId,success,payload}`).
 
-Protocol frame:
+Protocol frames:
 
 ```
-| 4-byte BE length | UTF-8 JSON payload |
+tcpkit: | 4-byte BE length | UTF-8 JSON |
+nest:   | "<len>#<json>" |  # e.g. 23#{"id":"...","pattern":"ping","data":{}}
 ```
 
-Request:
+Request/response examples:
 
 ```json
+// tcpkit
 { "requestId": "req_...", "pattern": "getUser", "payload": { "id": 123 } }
-```
-
-Response:
-
-```json
 { "requestId": "req_...", "success": true, "payload": { "id": 123, "name": "Vishu" } }
+// nest (wire)
+{ "id": "req_...", "pattern": "CustomerGroupInternalController.getCustomersByGroupId", "data": { "companyId":"19","groupId":421 } }
+{ "id": "req_...", "response": { "count":5, "rows":[...] }, "isDisposed": true }
 ```
+
+## Debugging
+
+Enable verbose logs to `stderr` (does not break Ink `stdout` rendering):
+
+```bash
+tcpkit localhost:3001 --transport nest --debug
+tcpkit localhost:3001 --transport nest --verbose --log-file ./tcpkit.log
+TCPKIT_DEBUG=1 tcpkit localhost:3001 --transport nest
+TCPKIT_LOG_FILE=./debug.log tcpkit localhost:3001 --transport nest
+```
+
+Logs: `TcpClient init`, `Connecting...`, `Connected in Xm`s, `Send start {requestId,pattern}`, `Serialized frame N bytes`, `Write success`, `Data received N bytes`, `Decoded N messages`, `Response received`.
+
+Large Nest payloads (e.g. `groupId:419` → 132 rows, ~28KB, 28062#...) are logged truncated to 500 chars.
 
 ## Development
 
@@ -134,7 +154,7 @@ npx nx test @tcpkit/protocol
 npx nx test @tcpkit/tcp-client
 npx nx test @tcpkit/core
 npx nx test tcpkit
-npx nx run-many -t test
+npx nx run-many -t test --parallel=3
 
 npx nx lint tcpkit
 npx nx typecheck tcpkit
@@ -144,11 +164,27 @@ npx nx sync
 
 ## Testing
 
-- Unit: endpoint parser (valid/invalid, IPv6), protocol (serialize, incomplete, multiple, malformed, oversized), JSON validator (objects/arrays/primitives/nested/malformed), CLI parser
-- Integration: real `node:net` server + `TcpClient` for connection, framing, concurrent, out-of-order, timeout, closure
+- Unit: endpoint parser (valid/invalid, IPv6), protocol (serialize, incomplete, multiple, malformed, oversized, nest framing), JSON validator, CLI parser
+- Integration: real `node:net` server + `TcpClient` (tcpkit and nest) for connection, framing, concurrent, out-of-order, timeout, closure
 
 ```bash
 npx nx run-many -t test --parallel=3
+```
+
+CI runs on every push to `main`/`master` and every PR (`/.github/workflows/ci.yml:1`):
+
+```yaml
+on:
+  {
+    push: { branches: [main, master] },
+    pull_request: { branches: [main, master] },
+  }
+jobs:
+  {
+    build: npx nx run-many -t build,
+    test: npx nx run-many -t test,
+    lint+typecheck,
+  }
 ```
 
 ## Build
@@ -156,6 +192,7 @@ npx nx run-many -t test --parallel=3
 ```bash
 npx nx build tcpkit   # outputs apps/cli/dist with bin: tcpkit -> dist/main.js
 node apps/cli/dist/main.js --help
+node apps/cli/dist/main.js localhost:3001 --transport nest --debug
 ```
 
 Published package (`apps/cli/package.json` name `tcpkit`) exposes:
@@ -168,29 +205,38 @@ Usage after publish:
 
 ```bash
 npx tcpkit localhost:4000
+npx tcpkit localhost:3001 --transport nest
 npm install -g tcpkit
-tcpkit localhost:4000
+tcpkit localhost:4000 --debug
 ```
 
-Artifact contains only runtime `dist` files, no Nx workspace required at runtime.
+Artifact contains only runtime `dist` files, no Nx workspace required.
+
+## CI/CD
+
+- **CI** `/.github/workflows/ci.yml:1` — runs `build` + `test` + `lint` + `typecheck` on `main`/`master` and PRs, with `nx sync:check` and `format:check`.
+- **Release** `/.github/workflows/release.yml:1` — on `push` to `main` or `workflow_dispatch` (dry_run toggle), does `npx nx sync`, `build`, `npx nx release --dry-run`, `npx nx release --verbose` with `NPM_TOKEN`/`NODE_AUTH_TOKEN` and `provenance`. Requires GitHub secret `NPM_TOKEN` (npm Automation token) and `contents:write` + `id-token:write`.
 
 ## Publishing
 
 ```bash
 npx nx build tcpkit
 npx nx release --dry-run
-npx nx release # versions and publishes @tcpkit/* and tcpkit
+npx nx release # versions and publishes @tcpkit/* and tcpkit (topological)
 ```
 
-Or manual for CLI only:
+Or manual:
 
 ```bash
-cd apps/cli
-npm publish --access public
+cd libs/protocol && npm publish --access public
+cd ../tcp-client && npm publish --access public
+cd ../core && npm publish --access public
+cd ../tui && npm publish --access public
+cd ../../apps/cli && npm publish --access public
 ```
 
 ## Errors
 
 Domain errors: `InvalidTcpEndpointError`, `InvalidTcpPortError`, `TcpConnectionError`, `TcpConnectionTimeoutError`, `TcpProtocolError`, `InvalidJsonPayloadError`, `TcpRequestTimeoutError`, `TcpSocketClosedError`, `TcpOversizedPayloadError`.
 
-Technical errors are translated to user-friendly TUI messages at presentation boundary.
+Technical errors are translated to user-friendly TUI messages at presentation boundary. Use `--debug` to see raw protocol errors.

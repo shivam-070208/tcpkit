@@ -32,7 +32,8 @@ export class TcpDebugLogger {
   private formatData(data: unknown): string {
     try {
       if (typeof data === 'string') return data;
-      if (Buffer.isBuffer(data)) return `Buffer(${data.length}): ${data.subarray(0, 200).toString('utf8')}${data.length > 200 ? '...' : ''}`;
+      if (Buffer.isBuffer(data))
+        return `Buffer(${data.length}): ${data.subarray(0, 200).toString('utf8')}${data.length > 200 ? '...' : ''}`;
       return JSON.stringify(data).slice(0, 2000);
     } catch {
       return String(data);

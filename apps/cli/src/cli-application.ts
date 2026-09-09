@@ -27,7 +27,11 @@ export class CliApplication {
       return;
     }
 
-    const inkInstance = render(React.createElement(TcpKitTui, { tcpKitConfiguration: parsedArguments.tcpKitConfiguration }));
+    const inkInstance = render(
+      React.createElement(TcpKitTui, {
+        tcpKitConfiguration: parsedArguments.tcpKitConfiguration,
+      }),
+    );
     await inkInstance.waitUntilExit();
   }
 

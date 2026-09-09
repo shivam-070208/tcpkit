@@ -1,4 +1,7 @@
-import { JsonPayloadValidator, InvalidJsonPayloadError } from './json-payload-validator.js';
+import {
+  JsonPayloadValidator,
+  InvalidJsonPayloadError,
+} from './json-payload-validator.js';
 
 describe('JsonPayloadValidator', () => {
   const validator = new JsonPayloadValidator();
@@ -19,7 +22,9 @@ describe('JsonPayloadValidator', () => {
   });
 
   it('should validate nested JSON', () => {
-    expect(validator.validate('{"a":{"b":[1,2]}}')).toEqual({ a: { b: [1, 2] } });
+    expect(validator.validate('{"a":{"b":[1,2]}}')).toEqual({
+      a: { b: [1, 2] },
+    });
   });
 
   it('should return empty object for empty', () => {
@@ -28,7 +33,9 @@ describe('JsonPayloadValidator', () => {
   });
 
   it('should throw for malformed JSON', () => {
-    expect(() => validator.validate('{invalid}')).toThrow(InvalidJsonPayloadError);
+    expect(() => validator.validate('{invalid}')).toThrow(
+      InvalidJsonPayloadError,
+    );
   });
 
   it('should provide meaningful error', () => {

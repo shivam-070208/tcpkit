@@ -35,7 +35,10 @@ export class TcpNestFrameDecoder {
           decodedMessages.push(JSON.parse(messageString));
           break;
         }
-        const messageString = this.stringBuffer.substring(0, this.contentLength);
+        const messageString = this.stringBuffer.substring(
+          0,
+          this.contentLength,
+        );
         const rest = this.stringBuffer.substring(this.contentLength);
         decodedMessages.push(JSON.parse(messageString));
         this.contentLength = null;

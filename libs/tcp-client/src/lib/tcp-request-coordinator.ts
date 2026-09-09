@@ -1,4 +1,7 @@
-import { TcpRequestTimeoutError, TcpSocketClosedError } from './tcp-client-error.js';
+import {
+  TcpRequestTimeoutError,
+  TcpSocketClosedError,
+} from './tcp-client-error.js';
 
 interface PendingTcpRequest {
   resolve: (value: unknown) => void;
@@ -7,7 +10,10 @@ interface PendingTcpRequest {
 }
 
 export class TcpRequestCoordinator {
-  private readonly pendingRequestsByIdentifier = new Map<string, PendingTcpRequest>();
+  private readonly pendingRequestsByIdentifier = new Map<
+    string,
+    PendingTcpRequest
+  >();
 
   register(requestIdentifier: string, timeoutMs: number): Promise<unknown> {
     return new Promise((resolve, reject) => {
@@ -31,7 +37,8 @@ export class TcpRequestCoordinator {
   }
 
   resolve(requestIdentifier: string, responsePayload: unknown): boolean {
-    const pendingRequest = this.pendingRequestsByIdentifier.get(requestIdentifier);
+    const pendingRequest =
+      this.pendingRequestsByIdentifier.get(requestIdentifier);
     if (!pendingRequest) return false;
     this.pendingRequestsByIdentifier.delete(requestIdentifier);
     pendingRequest.resolve(responsePayload);
@@ -39,14 +46,18 @@ export class TcpRequestCoordinator {
   }
 
   rejectAll(activeError: Error): void {
-    for (const [requestIdentifier, pendingRequest] of this.pendingRequestsByIdentifier.entries()) {
+    for (const [
+      requestIdentifier,
+      pendingRequest,
+    ] of this.pendingRequestsByIdentifier.entries()) {
       pendingRequest.reject(activeError);
       this.pendingRequestsByIdentifier.delete(requestIdentifier);
     }
   }
 
   reject(requestIdentifier: string, activeError: Error): boolean {
-    const pendingRequest = this.pendingRequestsByIdentifier.get(requestIdentifier);
+    const pendingRequest =
+      this.pendingRequestsByIdentifier.get(requestIdentifier);
     if (!pendingRequest) return false;
     this.pendingRequestsByIdentifier.delete(requestIdentifier);
     clearTimeout(pendingRequest.timeoutId);
