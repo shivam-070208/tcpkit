@@ -1,0 +1,37 @@
+{
+  "name": "tcpkit",
+  "version": "0.0.1",
+  "description": "TCP Kit - developer CLI/TUI for TCP microservices",
+  "type": "module",
+  "bin": {
+    "tcpkit": "./dist/main.js"
+  },
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/main.d.ts",
+      "import": "./dist/main.js",
+      "default": "./dist/main.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "tags": [
+      "scope:cli",
+      "type:app"
+    ]
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "@tcpkit/core": "0.0.1",
+    "@tcpkit/tcp-client": "0.0.1",
+    "@tcpkit/tui": "0.0.1",
+    "ink": "^7.1.1",
+    "react": "^19.3.0"
+  }
+}

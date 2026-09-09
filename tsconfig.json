@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./libs/protocol"
+    },
+    {
+      "path": "./libs/core"
+    },
+    {
+      "path": "./libs/tcp-client"
+    },
+    {
+      "path": "./libs/tui"
+    },
+    {
+      "path": "./apps/cli"
+    }
+  ],
+  "compilerOptions": {}
+}

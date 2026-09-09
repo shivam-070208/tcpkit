@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - run: npx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e"
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx nx sync:check
+
+      - run: npx nx record -- npx nx format:check --base=origin/main
+
+      - name: Build
+        run: npx nx record -- npx nx run-many -t build --parallel=3
+
+      - name: Test
+        run: npx nx record -- npx nx run-many -t test --parallel=3
+
+      - name: Lint & Typecheck
+        run: npx nx record -- npx nx run-many -t lint,typecheck --parallel=3
+
+      - run: npx nx fix-ci
+        if: always()
