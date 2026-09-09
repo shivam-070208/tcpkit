@@ -21,11 +21,15 @@ export class TcpDebugLogger {
     const formatted = `[${timestamp}] [${level}] ${message}${data !== undefined ? ` ${this.formatData(data)}` : ''}`;
     try {
       process.stderr.write(`${formatted}\n`);
-    } catch {}
+    } catch {
+      void 0;
+    }
     if (this.logFile) {
       try {
         appendFileSync(this.logFile, `${formatted}\n`);
-      } catch {}
+      } catch {
+        void 0;
+      }
     }
   }
 
