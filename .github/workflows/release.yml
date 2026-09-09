@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -19,7 +19,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v5
         with:
@@ -46,7 +46,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish
-        if: github.event.inputs.dry_run != 'true' && github.ref == 'refs/heads/main'
+        if: github.event.inputs.dry_run != 'true' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         run: npx nx release --verbose
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
