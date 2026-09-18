@@ -1,6 +1,6 @@
 {
   "name": "@tcpkit/protocol",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "TCP Kit protocol - frame encoders/decoders for tcpkit and NestJS transports",
   "keywords": ["tcp", "protocol", "tcpkit"],
   "author": "Shivam <shivam-070208@github>",

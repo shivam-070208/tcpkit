@@ -87,7 +87,7 @@ tcpkit localhost:4000 --connection-timeout 5000
 tcpkit localhost:4000 --request-timeout 30000
 tcpkit localhost:3001 --transport nest
 tcpkit localhost:3001 --transport nest --debug --log-file ./tcpkit.log
-tcpkit 13.127.85.156:32003 --transport nest --request-timeout 60000
+tcpkit localhost:32003 --transport nest --request-timeout 60000
 TCPKIT_DEBUG=1 tcpkit localhost:3001 --transport nest
 TCPKIT_LOG_FILE=./debug.log tcpkit localhost:3001 --transport nest
 ```
@@ -122,7 +122,7 @@ Request/response examples:
 { "requestId": "req_...", "pattern": "getUser", "payload": { "id": 123 } }
 { "requestId": "req_...", "success": true, "payload": { "id": 123, "name": "Vishu" } }
 // nest (wire)
-{ "id": "req_...", "pattern": "CustomerGroupInternalController.getCustomersByGroupId", "data": { "companyId":"19","groupId":421 } }
+{ "id": "req_...", "pattern": "UserService.getUser", "data": { "userId":"42","name":"john.doe" } }
 { "id": "req_...", "response": { "count":5, "rows":[...] }, "isDisposed": true }
 ```
 
