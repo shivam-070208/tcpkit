@@ -1,10 +1,28 @@
 {
   "name": "tcpkit",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "TCP Kit - developer CLI/TUI for TCP microservices",
+  "keywords": ["tcp", "cli", "tui", "microservices", "nestjs", "developer-tools", "network"],
+  "author": "Shivam <shivam-070208@github>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivam-070208/tcpkit.git"
+  },
+  "homepage": "https://github.com/shivam-070208/tcpkit#readme",
+  "bugs": {
+    "url": "https://github.com/shivam-070208/tcpkit/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "bin": {
-    "tcpkit": "./dist/main.js"
+    "tcpkit": "dist/main.js"
   },
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
@@ -28,9 +46,9 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@tcpkit/core": "0.0.1",
-    "@tcpkit/tcp-client": "0.0.1",
-    "@tcpkit/tui": "0.0.1",
+    "@tcpkit/core": "0.1.0",
+    "@tcpkit/tcp-client": "0.1.0",
+    "@tcpkit/tui": "0.1.0",
     "ink": "^7.1.1",
     "react": "^19.3.0"
   }

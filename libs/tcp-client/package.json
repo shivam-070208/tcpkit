@@ -1,6 +1,23 @@
 {
   "name": "@tcpkit/tcp-client",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "TCP Kit client - endpoint parser, connection lifecycle, request coordinator",
+  "keywords": ["tcp", "client", "tcpkit"],
+  "author": "Shivam <shivam-070208@github>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivam-070208/tcpkit.git",
+    "directory": "libs/tcp-client"
+  },
+  "homepage": "https://github.com/shivam-070208/tcpkit#readme",
+  "bugs": {
+    "url": "https://github.com/shivam-070208/tcpkit/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -26,6 +43,6 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@tcpkit/protocol": "0.0.1"
+    "@tcpkit/protocol": "0.1.0"
   }
 }

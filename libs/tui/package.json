@@ -1,6 +1,23 @@
 {
   "name": "@tcpkit/tui",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "TCP Kit TUI - Ink/React terminal UI for TCP interactions",
+  "keywords": ["tcp", "tui", "ink", "react", "tcpkit"],
+  "author": "Shivam <shivam-070208@github>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivam-070208/tcpkit.git",
+    "directory": "libs/tui"
+  },
+  "homepage": "https://github.com/shivam-070208/tcpkit#readme",
+  "bugs": {
+    "url": "https://github.com/shivam-070208/tcpkit/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -26,8 +43,8 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@tcpkit/core": "0.0.1",
-    "@tcpkit/tcp-client": "0.0.1",
+    "@tcpkit/core": "0.1.0",
+    "@tcpkit/tcp-client": "0.1.0",
     "ink": "^7.1.1",
     "react": "^19.3.0"
   }

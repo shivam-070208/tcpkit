@@ -1,6 +1,23 @@
 {
   "name": "@tcpkit/protocol",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "TCP Kit protocol - frame encoders/decoders for tcpkit and NestJS transports",
+  "keywords": ["tcp", "protocol", "tcpkit"],
+  "author": "Shivam <shivam-070208@github>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivam-070208/tcpkit.git",
+    "directory": "libs/protocol"
+  },
+  "homepage": "https://github.com/shivam-070208/tcpkit#readme",
+  "bugs": {
+    "url": "https://github.com/shivam-070208/tcpkit/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
