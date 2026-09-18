@@ -15,8 +15,7 @@
     "url": "https://github.com/shivam-070208/tcpkit/issues"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "access": "public"
   },
   "type": "module",
   "main": "./dist/index.js",

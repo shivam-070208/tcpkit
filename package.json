@@ -2,7 +2,32 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "description": "TCP Kit - developer CLI/TUI for TCP microservices (Nx workspace root)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivam-070208/tcpkit.git"
+  },
+  "homepage": "https://github.com/shivam-070208/tcpkit#readme",
+  "bugs": {
+    "url": "https://github.com/shivam-070208/tcpkit/issues"
+  },
+  "scripts": {
+    "build": "npx nx run-many -t build --parallel=3",
+    "build:all": "npx nx run-many -t build --parallel=3",
+    "test": "npx nx run-many -t test --parallel=3",
+    "publish": "bash ./scripts/publish.sh",
+    "publish:dry": "bash ./scripts/publish.sh --dry-run",
+    "publish:tcpkit": "bash ./scripts/publish-tcpkit.sh",
+    "publish:next": "bash ./scripts/publish.sh --tag next",
+    "release": "npx nx release --verbose",
+    "release:dry": "npx nx release --dry-run --verbose",
+    "release:patch": "npx nx release patch --verbose --yes",
+    "release:minor": "npx nx release minor --verbose --yes",
+    "release:major": "npx nx release major --verbose --yes",
+    "release:first": "npx nx release --first-release --verbose",
+    "version:patch": "npx nx release patch --skip-publish --verbose",
+    "version:minor": "npx nx release minor --skip-publish --verbose"
+  },
   "private": true,
   "dependencies": {
     "ink": "^7.1.1",
