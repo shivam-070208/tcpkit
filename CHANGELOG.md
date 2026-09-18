@@ -1,3 +1,13 @@
+## 0.1.1 (2026-09-18)
+
+### 🩹 Fixes
+
+- **publish:** remove registry from publishConfig, add bypass-2FA publish scripts ([64d4146](https://github.com/shivam-070208/tcpkit/commit/64d4146))
+
+### ❤️ Thank You
+
+- shivam gupta @shivam-070208
+
 ## 0.1.0 (2026-09-18)
 
 ### 🚀 Features

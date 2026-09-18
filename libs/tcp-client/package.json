@@ -1,6 +1,6 @@
 {
   "name": "@tcpkit/tcp-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TCP Kit client - endpoint parser, connection lifecycle, request coordinator",
   "keywords": ["tcp", "client", "tcpkit"],
   "author": "Shivam <shivam-070208@github>",
@@ -42,6 +42,6 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@tcpkit/protocol": "0.1.0"
+    "@tcpkit/protocol": "0.1.1"
   }
 }
