@@ -1,6 +1,6 @@
 {
   "name": "tcpkit",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "TCP Kit - developer CLI/TUI for TCP microservices",
   "keywords": [
     "tcp",
@@ -52,8 +52,8 @@
     ]
   },
   "dependencies": {
-    "@tcpkit/core": "0.1.3",
-    "@tcpkit/tcp-client": "0.1.3",
+    "@tcpkit/core": "0.1.4",
+    "@tcpkit/tcp-client": "0.1.4",
     "@tcpkit/tui": "^0.1.2",
     "ink": "^7.1.1",
     "react": "^19.3.0",

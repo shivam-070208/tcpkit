@@ -1,6 +1,6 @@
 {
   "name": "@tcpkit/tui",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "TCP Kit TUI - Ink/React terminal UI for TCP interactions",
   "keywords": ["tcp", "tui", "ink", "react", "tcpkit"],
   "author": "Shivam <shivam-070208@github>",
@@ -42,8 +42,8 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@tcpkit/core": "0.1.3",
-    "@tcpkit/tcp-client": "0.1.3",
+    "@tcpkit/core": "0.1.4",
+    "@tcpkit/tcp-client": "0.1.4",
     "ink": "^7.1.1",
     "react": "^19.3.0"
   }
